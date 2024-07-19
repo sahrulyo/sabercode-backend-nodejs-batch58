@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fetch Data Example</title>
+</head>
+<body>
+    <h1>Product List</h1>
+    <ul id="product-list"></ul>
+
+    <script>
+        async function getData() {
+            try {
+                const response = await fetch('https://dummyjson.com/products');
+                const data = await response.json();
+                console.log(data);
+
+                const productList = document.getElementById('product-list');
+                data.products.forEach(product => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `${product.title}: $${product.price}`;
+                    productList.appendChild(listItem);
+                });
+            } catch (error) {
+                console.error('error fetching data:', error);
+            }
+        }
+
+        getData();
+    </script>
+</body>
+</html>
