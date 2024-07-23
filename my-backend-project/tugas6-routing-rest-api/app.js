@@ -12,11 +12,13 @@ const products = [
     {id: 2, name: 'Meja', category: 'Perabotan'}
 ];
 
+// Jawaban soal no 1 --------------------------------------------->
 // Route GET untuk mengembalikan semua daftar category products
 app.get('/api/categories', (req, res) => {
     res.json(categories);
 });
 
+// Jawaban soal no 2 --------------------------------------------->
 // Route GET untuk mengembalikan detail category berdasarkan ID
 app.get('/api/categories/:id', (req, res) => {
     const id = parseInt(req.params.id);
@@ -28,6 +30,7 @@ app.get('/api/categories/:id', (req, res) => {
     }
 });
 
+// Jawaban soal no 3 --------------------------------------------->
 // Route POST untuk menambahkan kategori baru ke array
 app.post('/api/categories', (req, res) =>{
     const newCategory = {
@@ -38,6 +41,7 @@ app.post('/api/categories', (req, res) =>{
     res.status(201).json(newCategory);
 });
 
+// Jawaban soal no 4 --------------------------------------------->
 // Route PUT untuk memperbarui kategori berdasarkan ID
 app.put ('/api/categories/:id', (req, res)=> {
     const id = parseInt(req.params.id);
@@ -50,6 +54,7 @@ app.put ('/api/categories/:id', (req, res)=> {
     }
 });
 
+// Jawaban soal no 5 --------------------------------------------->
 // Route DELETE untuk menghapus kategori berdasarkan ID
 app.delete('/api/categories/:id', (req, res) => {
     const id = parseInt(req.params.id);
@@ -61,6 +66,8 @@ app.delete('/api/categories/:id', (req, res) => {
     }
 });
 
+
+// Jawaban soal no 6 --------------------------------------------->
 // Route GET dengan query string untuk mencari produk berdasarkan nama
 app.get('/api/products', (req, res) => {
     const name = req.query.name;
@@ -72,6 +79,8 @@ app.get('/api/products', (req, res) => {
     }
 });
 
+
+// Jawaban soal no 7 --------------------------------------------->
 // Route GET dengan parameter dan query string untuk mendapatkan produk dalam kategori tertentu dan mencari berdasarkan nama
 app.get('/api/categories/:categoryName/products', (req, res) => {
     const categoryName = req.params.categoryName;
