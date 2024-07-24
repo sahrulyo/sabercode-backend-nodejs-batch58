@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Management</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .container {
+            margin-top: 20px;
+        }
+        .product-form {
+            margin-bottom: 20px;
+        }
+        .product-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        .product-item img {
+            max-width: 100px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Tugas7 - Middleware Express</h1>
+
+        <!-- Form untuk Upload Gambar Tunggal -->
+        <div class="product-form">
+            <h3>Add/Edit Product with Single Image</h3>
+            <form id="singleImageForm" enctype="multipart/form-data">
+                <input type="hidden" id="singleProductId" name="productId">
+                <div class="form-group">
+                    <label for="singleName">Name:</label>
+                    <input type="text" class="form-control" id="singleName" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="singlePrice">Price:</label>
+                    <input type="number" class="form-control" id="singlePrice" name="price" required>
+                </div>
+                <div class="form-group">
+                    <label for="singleImage">Single Image:</label>
+                    <input type="file" class="form-control" id="singleImage" name="image">
+                </div>
+                <button type="submit" class="btn btn-primary">Submit Single Image</button>
+            </form>
+        </div>
+
+        <!-- Form untuk Upload Gambar Multiple -->
+        <div class="product-form">
+            <h3>Add/Edit Product with Multiple Images</h3>
+            <form id="multipleImageForm" enctype="multipart/form-data">
+                <input type="hidden" id="multipleProductId" name="productId">
+                <div class="form-group">
+                    <label for="multipleName">Name:</label>
+                    <input type="text" class="form-control" id="multipleName" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="multiplePrice">Price:</label>
+                    <input type="number" class="form-control" id="multiplePrice" name="price" required>
+                </div>
+                <div class="form-group">
+                    <label for="multipleImages">Multiple Images:</label>
+                    <input type="file" class="form-control" id="multipleImages" name="images" multiple>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit Multiple Images</button>
+            </form>
+        </div>
+
+        <div class="product-list">
+            <h3>Product List</h3>
+            <div id="products"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const singleImageForm = document.getElementById('singleImageForm');
+            const multipleImageForm = document.getElementById('multipleImageForm');
+            const productsContainer = document.getElementById('products');
+
+            const fetchProducts = async () => {
+                const response = await fetch('/api/products');
+                const products = await response.json();
+                renderProducts(products);
+            };
+
+            const renderProducts = (products) => {
+                productsContainer.innerHTML = '';
+                products.forEach(product => {
+                    const productElement = document.createElement('div');
+                    productElement.className = 'product-item';
+                    productElement.innerHTML = `
+                        <h4>${product.name}</h4>
+                        <p>Price: $${product.price}</p>
+                        ${product.image ? `<img src="${product.image}" alt="${product.name}">` : ''}
+                        ${product.images.length ? product.images.map(img => `<img src="${img}" alt="${product.name}">`).join('') : ''}
+                        <button class="btn btn-warning" onclick="editProduct(${product.id})">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteProduct(${product.id})">Delete</button>
+                    `;
+                    productsContainer.appendChild(productElement);
+                });
+            };
+
+            singleImageForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const formData = new FormData(singleImageForm);
+                const productId = formData.get('productId');
+                const url = productId ? `/api/products/${productId}/single` : '/api/products/single';
+                const method = productId ? 'PUT' : 'POST';
+
+                const response = await fetch(url, {
+                    method,
+                    body: formData
+                });
+
+                if (response.ok) {
+                    singleImageForm.reset();
+                    fetchProducts();
+                } else {
+                    console.error('Failed to upload single image');
+                }
+            });
+
+            multipleImageForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const formData = new FormData(multipleImageForm);
+                const productId = formData.get('productId');
+                const url = productId ? `/api/products/${productId}/multiple` : '/api/products/multiple';
+                const method = productId ? 'PUT' : 'POST';
+
+                const response = await fetch(url, {
+                    method,
+                    body: formData
+                });
+
+                if (response.ok) {
+                    multipleImageForm.reset();
+                    fetchProducts();
+                } else {
+                    console.error('Failed to upload multiple images');
+                }
+            });
+
+            window.editProduct = async (id) => {
+                const response = await fetch(`/api/products/${id}`);
+                const product = await response.json();
+                document.getElementById('singleProductId').value = product.id;
+                document.getElementById('singleName').value = product.name;
+                document.getElementById('singlePrice').value = product.price;
+                document.getElementById('multipleProductId').value = product.id;
+                document.getElementById('multipleName').value = product.name;
+                document.getElementById('multiplePrice').value = product.price;
+                // Handle images update if needed
+            };
+
+            window.deleteProduct = async (id) => {
+                await fetch(`/api/products/${id}`, { method: 'DELETE' });
+                fetchProducts();
+            };
+
+            fetchProducts();
+        });
+    </script>
+</body>
+</html>
