@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product List-item</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+        }
+        .product-card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 300px;
+            display: inline-block;
+            vertical-align: top;
+        }
+        .product-card h3 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+        .product-card p {
+            margin: 5px 0;
+        }
+        .form-container {
+            margin-top: 20px;
+        }
+        .form-container input, .form-container button, .form-container textarea {
+            margin: 5px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .form-container button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .form-container button:hover {
+            background-color: #0056b3;
+        }
+        .form-container label {
+            display: block;
+            margin-top: 10px;
+        }
+        .product-card img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Product List</h1>
+        <div id="productList"></div>
+
+        <div class="form-container">
+            <h2>Add New Product</h2>
+            <form id="productForm">
+                <input type="text" id="productName" placeholder="Product Name" required>
+                <input type="number" id="productPrice" placeholder="Product Price" required>
+                <button type="submit">Add Product</button>
+            </form>
+
+            <h2>Update or Delete Product</h2>
+            <input type="text" id="updateProductId" placeholder="Product ID to update/delete">
+            <input type="text" id="updateProductName" placeholder="New Product Name">
+            <input type="number" id="updateProductPrice" placeholder="New Product Price">
+            <button onclick="updateProduct()">Update Product</button>
+            <button onclick="deleteProduct()">Delete Product</button>
+        </div>
+
+        <div class="form-container">
+            <h2>Upload Single Image</h2>
+            <form id="uploadSingleForm" enctype="multipart/form-data">
+                <label for="singleImage">Choose Image:</label>
+                <input type="file" id="singleImage" name="singleImage" required>
+                <button type="submit">Upload Image</button>
+            </form>
+
+            <h2>Upload Multiple Images</h2>
+            <form id="uploadMultipleForm" enctype="multipart/form-data">
+                <label for="multipleImages">Choose Images:</label>
+                <input type="file" id="multipleImages" name="multipleImages" multiple required>
+                <button type="submit">Upload Images</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const apiUrl = 'http://localhost:3002/api/products/';
+
+        document.addEventListener('DOMContentLoaded', fetchProducts);
+
+        function fetchProducts() {
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    const productList = document.getElementById('productList');
+                    productList.innerHTML = '';
+                    if (data && Array.isArray(data.data)) {
+                        data.data.forEach(product => {
+                            const card = document.createElement('div');
+                            card.classList.add('product-card');
+                            card.innerHTML = `
+                                <h3>${product.name}</h3>
+                                <p>Price: $${product.price}</p>
+                                <p>ID: ${product._id}</p>
+                            `;
+                            productList.appendChild(card);
+                        });
+                    } else {
+                        productList.innerHTML = '<p>No products found</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching products:', error);
+                    const productList = document.getElementById('productList');
+                    productList.innerHTML = '<p>Error fetching products</p>';
+                });
+        }
+
+        document.getElementById('productForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const name = document.getElementById('productName').value;
+            const price = document.getElementById('productPrice').value;
+
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, price })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Product added:', data);
+                fetchProducts(); 
+                this.reset();
+            })
+            .catch(error => {
+                console.error('Error adding product:', error);
+            });
+        });
+
+        function updateProduct() {
+            const id = document.getElementById('updateProductId').value;
+            const name = document.getElementById('updateProductName').value;
+            const price = document.getElementById('updateProductPrice').value;
+
+            fetch(`${apiUrl}${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, price })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Product updated:', data);
+                fetchProducts(); 
+            })
+            .catch(error => {
+                console.error('Error updating product:', error);
+            });
+        }
+
+        function deleteProduct() {
+            const id = document.getElementById('updateProductId').value;
+
+            fetch(`${apiUrl}${id}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Product deleted:', data);
+                fetchProducts(); 
+            })
+            .catch(error => {
+                console.error('Error deleting product:', error);
+            });
+        }
+
+        // Handle single image upload
+        document.getElementById('uploadSingleForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData();
+            formData.append('singleImage', document.getElementById('singleImage').files[0]);
+
+            fetch('http://localhost:3002/api/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Single image uploaded:', data);
+            })
+            .catch(error => {
+                console.error('Error uploading single image:', error);
+            });
+        });
+
+        // Handle multiple images upload
+        document.getElementById('uploadMultipleForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData();
+            const files = document.getElementById('multipleImages').files;
+            for (const file of files) {
+                formData.append('multipleImages', file);
+            }
+
+            fetch('http://localhost:3002/api/uploads', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Multiple images uploaded:', data);
+            })
+            .catch(error => {
+                console.error('Error uploading multiple images:', error);
+            });
+        });
+    </script>
+</body>
+</html>

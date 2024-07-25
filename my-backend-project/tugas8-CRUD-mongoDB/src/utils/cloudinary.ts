@@ -17,7 +17,11 @@ export const handleUpload = async (file: string) => {
     const result = await cloudinary.uploader.upload(file, { resource_type: "auto" });
     return result;
   } catch (error) {
-    throw new Error(`Failed to upload file: ${error.message}`);
+    if (error instanceof Error) {
+      throw new Error(`Failed to upload file: ${error.message}`);
+    } else {
+      throw new Error('Failed to upload file: An unknown error occurred');
+    }
   }
 };
 
