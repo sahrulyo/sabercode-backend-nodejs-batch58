@@ -1,12 +1,37 @@
 import { Request, Response } from "express";
 import ProductsModel from "@/models/products.model";
+import CategoriesModel from "@/models/categories.model";
+
 
 export default {
+  // create------------------------------------------------> REVISI CODE
   async create(req: Request, res: Response) {
     try {
-      const result = await ProductsModel.create(req.body);
+      const { name, description, images, price, qty, category } = req.body;
+
+      // Cek apakah kategori ada
+      const categoryExists = await CategoriesModel.findById(category);
+      if (!categoryExists) {
+        return res.status(400).json({
+          message: "Category does not exist",
+        });
+      }
+
+      // Simpan produk baru
+      const newProduct = await ProductsModel.create({
+        name,
+        description,
+        images,
+        price,
+        qty,
+        category
+      });
+
+      // Populate category details
+      const populatedProduct = await ProductsModel.findById(newProduct._id).populate('category');
+
       res.status(201).json({
-        data: result,
+        data: populatedProduct,
         message: "Success create product",
       });
     } catch (error) {
@@ -17,9 +42,11 @@ export default {
       });
     }
   },
+
+  // find all ------------------------------------------------>
   async findAll(req: Request, res: Response) {
     try {
-      const result = await ProductsModel.find();
+      const result = await ProductsModel.find().populate('category');
       res.status(200).json({
         data: result,
         message: "Success get all products",
@@ -32,11 +59,13 @@ export default {
       });
     }
   },
+  
+  // find one ------------------------------------------------>
   async findOne(req: Request, res: Response) {
     try {
       const result = await ProductsModel.findOne({
         _id: req.params.id,
-      });
+      }).populate('category');
       res.status(200).json({
         data: result,
         message: "Success get one product",
@@ -49,6 +78,8 @@ export default {
       });
     }
   },
+
+  // update ------------------------------------------------>
   async update(req: Request, res: Response) {
     try {
       const result = await ProductsModel.findOneAndUpdate(
@@ -57,7 +88,7 @@ export default {
         {
           new: true,
         }
-      );
+      ).populate('category');
 
       res.status(200).json({
         data: result,
@@ -71,6 +102,8 @@ export default {
       });
     }
   },
+
+  // delete ------------------------------------------------>
   async delete(req: Request, res: Response) {
     try {
       const result = await ProductsModel.findOneAndDelete({
