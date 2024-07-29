@@ -65,6 +65,10 @@ const ProductsSchema = new Schema(
       required: true,
       min: [1, "Quantity cannot be less than 1"],
     },
+    slug: {
+      type: String,
+      unique: true,
+    },
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Categories",
@@ -74,6 +78,14 @@ const ProductsSchema = new Schema(
     timestamps: true,
   }
 );
+
+ProductsSchema.pre("save", function (next) {
+  const product = this;
+  if (!product.slug) {
+    product.slug = product.name.toLowerCase().split(" ").join("-");
+  }
+  next();
+});
 
 const ProductsModel = mongoose.model("Products", ProductsSchema);
 

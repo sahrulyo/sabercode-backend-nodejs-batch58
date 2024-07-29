@@ -1,12 +1,30 @@
 import { Request, Response } from "express";
 import ProductsModel from "@/models/products.model";
 import CategoriesModel from "@/models/categories.model";
+import *  as Yup from 'yup';
 
+const createValidationSchema = Yup.object().shape(
+  {
+    name: Yup.string().required(),
+    description: Yup.string().required(),
+    price: Yup.number().required(),
+    images: Yup.string().required(),
+    category: Yup.string().required(),
+    qty: Yup.number().required().min(1),
+  }
+);
+
+interface IPaginationQuery {
+  page: number;
+  limit: number;
+  search?:string;
+}
 
 export default {
   // create------------------------------------------------> REVISI CODE
   async create(req: Request, res: Response) {
     try {
+      await createValidationSchema.validate(req.body);
       const { name, description, images, price, qty, category } = req.body;
 
       // Cek apakah kategori ada
@@ -35,6 +53,13 @@ export default {
         message: "Success create product",
       });
     } catch (error) {
+      if (error instanceof Yup.ValidationError){
+        res.status(400).json({
+          data: error.errors,
+          message: "Failed create product",
+        });
+        return;
+      }
       const err = error as Error;
       res.status(500).json({
         data: err.message,
@@ -46,11 +71,36 @@ export default {
   // find all ------------------------------------------------>
   async findAll(req: Request, res: Response) {
     try {
-      const result = await ProductsModel.find().populate('category');
+      const {
+        limit = 10,
+        page = 1,
+        search = "",
+      } = req.query as unknown as IPaginationQuery;
+
+      const query: any = {};
+
+      if (search) {
+        Object.assign(query, {
+          name: { $regex: search, $options: "i"},
+        });
+      }
+      const result = await ProductsModel.find(query)
+      .limit(+limit)
+      .skip((+page - 1) *  + limit)
+      .sort({ createAt: -1})
+      .populate('category');
+
+      const total = await ProductsModel.countDocuments(query);
+
       res.status(200).json({
         data: result,
-        message: "Success get all products",
+        message: "Success find all products",
+        page: +page,
+        limit: +limit,
+        total,
+        totalPages: Math.ceil(total / +limit),
       });
+     
     } catch (error) {
       const err = error as Error;
       res.status(500).json({

@@ -24,4 +24,5 @@ router.put("/categories/:id", categoriesController.update);
 router.delete("/categories/:id", categoriesController.delete);
 
 
+
 export default router;
