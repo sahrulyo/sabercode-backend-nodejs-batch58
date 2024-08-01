@@ -7,3 +7,6 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export const DATABASE_URL: string = process.env.DATABASE_URL || "mongodb+srv://yoyoptr:aBkxA59UfZX4ip1K@cluster01.ynwnlxc.mongodb.net/?retryWrites=true&w=majority&appName=Cluster01";
+
+
+export const SECRET: string = process.env.SECRET || "secret";
