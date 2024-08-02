@@ -7,6 +7,8 @@ import { decrypt } from "@/utils/encryption";
 import { SECRET } from "@/utils/env";
 import { IReqUser } from "@/utils/interfaces";
 
+import authorizeRoles from "@/middlewares/acl.midllewares";
+
 //validate --------------------------------------------->
 
 const validateRegisterSchema = Yup.object().shape({
@@ -154,7 +156,7 @@ export default {
 
     // register ------------------------------------------------->
     async register(req: Request, res: Response) {
-      const { fullName, username, email, password } = req.body;
+      const { fullName, username, email, password, role= ["user"] } = req.body;
       try {
         await validateRegisterSchema.validate({
           fullName,
