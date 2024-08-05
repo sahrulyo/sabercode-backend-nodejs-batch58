@@ -3,11 +3,10 @@ import * as Yup from "yup";
 import jwt from "jsonwebtoken";
 
 import UserModel from "@/models/user.model";
-import { decrypt } from "@/utils/encryption";
+import { decrypt, encrypt } from "@/utils/encryption";
 import { SECRET } from "@/utils/env";
 import { IReqUser } from "@/utils/interfaces";
 
-import authorizeRoles from "@/middlewares/acl.midllewares";
 
 //validate --------------------------------------------->
 
@@ -39,6 +38,47 @@ const validateRegisterSchema = Yup.object().shape({
   
 
 export default {
+
+    // register admin  ------------------------------------------------->
+
+    async registerAdmin(req: Request, res: Response) {
+      const { fullName, username, email, password, role = "admin" } = req.body;
+      try {
+        await validateRegisterSchema.validate({
+          fullName,
+          username,
+          email,
+          password,
+        });
+  
+        const user = await UserModel.create({
+          fullName,
+          username,
+          email,
+          password,
+          role, // Set role as admin
+        });
+  
+        res.json({
+          message: "Admin registered successfully",
+          data: user,
+        });
+      } catch (error) {
+        if (error instanceof Yup.ValidationError) {
+          return res.status(400).send({
+            message: "Validation failed",
+            error: error.errors,
+          });
+        }
+  
+        const _err = error as Error;
+  
+        res.status(500).json({
+          message: "Error registering admin",
+          data: _err.message,
+        });
+      }
+    },
 
     // profile  ------------------------------------------------->
     async profile(req: Request, res: Response) {
@@ -163,6 +203,7 @@ export default {
           username,
           email,
           password,
+          role,
         });
   
         const user = await UserModel.create({
@@ -170,7 +211,8 @@ export default {
           username,
           email,
           password,
-          role: "user", // default role
+          role,
+          // "user", // default role
         });
         res.json({
           message: "User registered successfully",
@@ -192,4 +234,21 @@ export default {
         });
       }
     },
+    // get all users ------------------------------------------------->
+  async getAll(req: Request, res: Response) {
+    try {
+      const users = await UserModel.find();
+
+      res.status(200).json({
+        message: "All users retrieved successfully",
+        data: users,
+      });
+    } catch (error) {
+      const _err = error as Error;
+      res.status(500).json({
+        message: "Error retrieving users",
+        data: _err.message,
+      });
+    }
+  },
   };

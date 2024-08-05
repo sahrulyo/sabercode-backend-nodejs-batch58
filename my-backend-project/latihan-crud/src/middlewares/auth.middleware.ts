@@ -21,7 +21,9 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   }
 
   try {
-    const user = jwt.verify(accessToken, SECRET) as { id: string; role: string };
+    const user = jwt.verify(accessToken, SECRET) as {
+      roles: string[]; id: string; role: string 
+};
 
     if (!user) {
       return res.status(401).json({
@@ -32,6 +34,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
     (req as IReqUser).user = {
       id: user.id,
       role: user.role,
+      roles: user.roles,
     };
 
     next();

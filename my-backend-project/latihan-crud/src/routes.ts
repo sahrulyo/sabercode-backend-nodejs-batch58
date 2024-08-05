@@ -6,6 +6,7 @@ import uploadController from "./controllers/upload.controller";
 import productsController from "./controllers/products.controller";
 import authMiddleware from "./middlewares/auth.middleware";
 import aclMiddleware from "./middlewares/acl.midllewares"
+import authorizeRoles from "./middlewares/acl.midllewares";
 
 const router = express.Router();
 
@@ -26,9 +27,28 @@ router.put("/categories/:id", categoriesController.update);
 router.delete("/categories/:id", categoriesController.delete);
 
 router.post("/auth/login", authController.login);
+
 router.post("/auth/register", authController.register);
-router.get("/auth/me", [authMiddleware, aclMiddleware(["admin"])], authController.me);
+
+// Register Admin (only accessible by admin)
+router.post(
+    "/register/admin",
+    authMiddleware,
+    authorizeRoles(["admin"]),  // Using the updated authorizeRoles middleware
+    authController.registerAdmin
+  );
+  
+// Get current user details
+router.get("/auth/me", [authMiddleware, authorizeRoles(["admin", "user"])], authController.me);
+
+// Update user profile
 router.put("/auth/profile", authMiddleware, authController.profile);
+
+// Get all users (only accessible by admin)
+router.get("/auth/users", authMiddleware, authorizeRoles(["admin"]), authController.getAll)
+
+router.post("/auth/register-admin", authController.registerAdmin);
+
 
 
 export default router;
