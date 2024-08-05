@@ -2,14 +2,12 @@ import express from "express";
 import db from "@/utils/database";
 import routes from "@/routes";
 import bodyParser from "body-parser";
-import "module-alias/register";
 const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 db();
-
 
 
 app.use(bodyParser.json());
