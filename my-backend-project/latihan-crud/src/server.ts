@@ -1,5 +1,5 @@
 import express from "express";
-import db from "@/utils/database";
+import db from "./utils/database";
 import routes from "@/routes";
 import bodyParser from "body-parser";
 const path = require('path');

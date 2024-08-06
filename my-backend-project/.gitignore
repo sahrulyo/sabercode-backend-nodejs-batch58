@@ -5,5 +5,5 @@
 .DS_Store
 .env
 
-# Dist folder
+# Dist folder -->
 dist/
