@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import ProductsModel from "@/models/products.model";
-import CategoriesModel from "@/models/categories.model";
+import ProductsModel from "../models/products.model";
+import CategoriesModel from "../models/categories.model";
 import *  as Yup from 'yup';
 
 

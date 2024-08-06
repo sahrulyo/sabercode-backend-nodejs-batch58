@@ -9,8 +9,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const encode_1 = require("@/utils/encode");
-const cloudinary_1 = require("@/utils/cloudinary");
+const encode_1 = require("../utils/encode");
+const cloudinary_1 = require("../utils/cloudinary");
 exports.default = {
     single(req, res) {
         return __awaiter(this, void 0, void 0, function* () {

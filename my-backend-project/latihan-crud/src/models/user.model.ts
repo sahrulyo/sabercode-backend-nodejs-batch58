@@ -1,6 +1,6 @@
 import { SECRET } from '../utils/env'
 import mongoose from "mongoose";
-import { encrypt } from "@/utils/encryption";
+import { encrypt } from "../utils/encryption";
 
 
 const Schema = mongoose.Schema;

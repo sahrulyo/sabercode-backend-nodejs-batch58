@@ -35,8 +35,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const products_model_1 = __importDefault(require("@/models/products.model"));
-const categories_model_1 = __importDefault(require("@/models/categories.model"));
+const products_model_1 = __importDefault(require("../models/products.model"));
+const categories_model_1 = __importDefault(require("../models/categories.model"));
 const Yup = __importStar(require("yup"));
 const createValidationSchema = Yup.object().shape({
     name: Yup.string().required(),

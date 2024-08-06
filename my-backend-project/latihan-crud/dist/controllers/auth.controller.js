@@ -37,9 +37,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const Yup = __importStar(require("yup"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const user_model_1 = __importDefault(require("@/models/user.model"));
-const encryption_1 = require("@/utils/encryption");
-const env_1 = require("@/utils/env");
+const user_model_1 = __importDefault(require("../models/user.model"));
+const encryption_1 = require("../utils/encryption");
+const env_1 = require("../utils/env");
 //validate --------------------------------------------->
 const validateRegisterSchema = Yup.object().shape({
     fullName: Yup.string().required(),

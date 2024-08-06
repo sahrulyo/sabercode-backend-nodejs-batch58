@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const env_1 = require("../utils/env");
 const mongoose_1 = __importDefault(require("mongoose"));
-const encryption_1 = require("@/utils/encryption");
+const encryption_1 = require("../utils/encryption");
 const Schema = mongoose_1.default.Schema;
 const UserSchema = new Schema({
     fullName: {
